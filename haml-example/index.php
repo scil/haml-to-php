@@ -6,7 +6,7 @@ define('BASE',dirname(__FILE__));
 
 define('HAML_DIR',BASE.'/haml');
 define('HAML_TEMLPATE_CACHE',BASE.'/template-cache');
-mkdir(HAML_TEMLPATE_CACHE, 0777, true);
+@mkdir(HAML_TEMLPATE_CACHE, 0777, true);
 
 // create caching haml object
 $haml = new HamlFileCache(HAML_DIR, HAML_TEMLPATE_CACHE);
