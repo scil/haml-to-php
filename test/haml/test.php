@@ -16,7 +16,8 @@ function strip($s)
     return $s;
   // dropping / to ignore HTML vs XHTML
   // haml is quoting attrs by, phamlp by " ?
-  return str_replace("\n","",preg_replace('/[ \t]*/','',$s));
+  // add "\r" to support Win32 newline
+  return str_replace(array("\n","\r"),"",preg_replace('/[ \t]*/','',$s));
 }
 
 $ok = 0;
@@ -29,10 +30,13 @@ $skip = array(
   "content in a 'preserve' filter",
 );
 
-foreach (array(
+if(empty($jsondata))
+  $jsondata=array(
       dirname(__FILE__).'/ruby-haml-3.0.24-tests.json',
       dirname(__FILE__).'/extra-tests.json',
-  ) as $file) {
+  );
+
+foreach ($jsondata as $file) {
 
   $tests = json_decode(file_get_contents($file), true);
   if (empty($tests))
@@ -46,7 +50,7 @@ foreach (array(
         continue;
       if (isset($only) && $nr != $only)
         continue;
-      
+
       $haml_str = $test['haml'];
       $expected = $test['html'];
 
@@ -65,13 +69,13 @@ foreach (array(
         switch($way) {
           case 1:
             // generate php function:
-            $php_function = $haml->hamlToPHP($haml_str, $test,$f); 
+            $php_function = $haml->hamlToPHP($haml_str, $test,$f);
             eval($php_function); // create function
             $rendered = $f($locals);
             break;
           case 2:
             // generate code to be required or evaled:
-            $php = $haml->hamlToPHP($haml_str, $test); 
+            $php = $haml->hamlToPHP($haml_str, $test);
             $php_file = dirname(__FILE__).'/tmp/tmp.php';
             file_put_contents($php_file, $php);
             $rendered = HamlUtilities::runTemplate($php_file, $locals);
