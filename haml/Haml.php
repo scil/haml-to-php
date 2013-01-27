@@ -13,6 +13,7 @@ class HamlParseException extends Exception {}
 // see filter option in option_defaults
 // This class contains functions which are called by templates
 class HamlUtilities {
+
   /* functions called by templates */
   static public function plain($encoding, $s){ return $s; }
   static public function javascript($encoding, $s){
@@ -84,11 +85,12 @@ class HamlUtilities {
   /* functions which could be useful to you */
   static public function hamlToPHPStr($str, $options, $filename = '', $func_name = null){
     require_once dirname(__FILE__).'/HamlParser.php';
-    $hamlTree = new HamlTree($str, $options, $filename);
+    $hamlTree = new HamlTreeWithSnip($str, $options, $filename);
     // var_export($hamlTree->childs);
     return $hamlTree->toPHP($func_name);
   }
 
+  //TODO:use uniq names, keep form conflict
   static public function runTemplate($file /*, .. */){
     // using these function to render the template allows
     // putting array keys in local scope using extract
@@ -293,3 +295,31 @@ class HamlFileCache extends Haml {
   }
 }
 // vim: fdm=marker
+
+//for renderring snip seperately
+class HamlUtilitiesSnip extends HamlUtilities{
+
+    static $placeholder_contents=array();
+    static $treeopts=array();
+    static function parseSnipToFile($name,$tree_id,$snip_index,$file){
+
+        $attrs=array();
+        if( ($num=func_num_args()) > 4){
+            $args = func_get_args();
+            for ($i = 4; $i < $num; $i++) {
+                $attrs[$args[$i++]]=$args[$i];
+            }
+        }
+
+        $tree= new SnipTree(Snip::getSnip($name,$attrs),$tree_id,$snip_index,self::$treeopts[$tree_id],'');
+        $content=$tree->toPHP(null);
+        if($file){
+            $file=implode('',array(HAML_SNIP_CACHE,'/snip_',$name,'_',implode('_',$attrs),'_',uniqid()));
+        }else{
+            $file = tempnam(sys_get_temp_dir(), 'snip');
+        }
+        file_put_contents($file , $content);
+        return $file;
+    }
+
+}

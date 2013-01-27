@@ -1,4 +1,11 @@
 
+# special features
+
+- snip : like php statement 'include', details at wiki
+
+
+# original author
+
 Thanks to all who bought the library (about 24 people) while it was propriatary.
 It didn't pay off for me - releasing it as open source now - enjoy.
 
