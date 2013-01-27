@@ -1,0 +1,168 @@
+{
+  "snip" : {
+    "only snip": {
+      "haml" : "@hello",
+      "html" : "<div id='head'><div class='c1'>hello</div></div>"    },
+    "snip as sibling": {
+      "haml" : "#hello\n@hello",
+      "html" : "<div id='hello'></div><div id='head'><div class='c1'>hello</div></div>"    },
+	"snip as child":{
+	  "haml":"#hello\n  @hello",
+      "html" : "<div id='hello'><div id='head'><div class='c1'>hello</div></div></div>"	}
+  },
+
+
+  "placeholder":{
+    "only one placeholder":{
+	  "haml":"@hello1\n  #hello\n    hello\n  .hello\n    world\n#sibling",
+      "html" : "<div id='head'><div id='hello'>hello</div><div class='hello'>world</div><div class='c1'>hello</div></div><div id='sibling'></div>"    },
+    "only one placeholder, one line text":{
+	  "haml":"@hello1 placeholdercontent\n#sibling",
+      "html" : "<div id='head'>placeholdercontent<div class='c1'>hello</div></div><div id='sibling'></div>"    },
+    "two placeholders":{
+	  "haml":"@hello2\n  _\n    #hello\n      hello\n  _\n    .hello\n      world\n#sibling",
+      "html" : "<div id='head'><div id='hello'>hello</div><div class='c1'>hello<div class='hello'>world</div></div></div><div id='sibling'></div>"    },
+    "named placeholder":{
+	  "haml":"@name\n  _pl1\n    #hello\n      hello\n  _pl2\n    .hello\n      world\n#sibling",
+      "html" : "<div id='head'><div id='hello'>hello</div><div class='c1'>hello<div class='hello'>world</div></div></div><div id='sibling'></div>"	},
+    "name and unname mixed placeholder":{
+	  "haml":"@mix\n  _\n    #hello\n      hello\n  _\n    #hello\n      hello\n  _pl2\n    .hello\n      world\n#sibling",
+      "html" : "<div id='head'><div id='hello'>hello</div><div class='c1'>hello<div class='hello'>world</div></div><div id='hello'>hello</div></div><div id='sibling'></div>"	},
+    "two placeholders, each one has one line text only":{
+      "haml":"@hello2\n  _ pl1\n  _ pl2\n#sibling",
+      "html" : "<div id='head'>pl1<div class='c1'>hellopl2</div></div><div id='sibling'></div>"    }
+  },
+
+  "simple attr":{
+    "html format":{
+	  "haml":"@hellocall(name=\"ivy\" age=\"30\")",
+      "html" : "<div class='person' id='ivy'><div class='name'>ivy</div><div class='age'>30</div></div>"	},
+    "ruby format":{
+	  "haml":"@hellocall{:name=>\"ivy\" , :age=>\"30\"}",
+      "html" : "<div class='person' id='ivy'><div class='name'>ivy</div><div class='age'>30</div></div>"	},
+    "mixed format":{
+	  "haml":"@hellocall(name=\"ivy\"){:age=>\"30\"}",
+      "html" : "<div class='person' id='ivy'><div class='name'>ivy</div><div class='age'>30</div></div>"	}
+  }
+
+  ,"interpolated attribute" : {
+  	"var":{
+      "haml" : "@hellocall{:age =>\"#{$var}\"}",
+      "html" : "<div class='person' id='wl'><div class='name'>wl</div><div class='age'>31</div></div>",
+      "locals" : {
+        "var" : "31"
+      },
+      "config" : {
+        "snipsep" : "true"
+      }
+    }
+
+  	,"function":{
+      "haml" : "@hellocall{:age =>\"#{max($var,45)}\"}",
+      "html" : "<div class='person' id='wl'><div class='name'>wl</div><div class='age'>45</div></div>",
+      "locals" : {
+        "var" : "31"
+      },
+      "config" : {
+        "snipsep" : true
+      }
+    }
+
+  }
+
+
+  ,"force render snip seperately":{
+    "simple attr":{
+	  "haml":"@!hellocall(name=\"ivy\"){:age=>\"30\"}",
+      "html" : "<div class='person' id='ivy'><div class='name'>ivy</div><div class='age'>30</div></div>"
+	},
+  	"varable":{
+      "haml" : "-$age++\n@!hellocall{:age =>\"#{$age}\", :name => \"#{$name}\" }",
+      "html" : "<div class='person' id='ivy'><div class='name'>ivy</div><div class='age'>32</div></div>",
+      "locals" : {
+        "age" : "31",
+		"name":"ivy"
+      }
+    }
+	,"function":{
+      "haml" : "-$age++\n-function getname($age){if($age>31) return 'oldme';else return 'youngme';}\n@!hellocall{:age =>\"#{$age}\", :name => \"#{getname($age)}\" }",
+      "html" : "<div class='person' id='oldme'><div class='name'>oldme</div><div class='age'>32</div></div>",
+      "locals" : {
+        "age" : "31",
+		"name":"ivy"
+      }
+	}
+  }
+
+  ,"keep snip cache":{
+    "for snips rendered seperately":{
+      "haml" : "@hello\n@!hellocall(name=\"anna\")",
+      "html" : "<div id='head'><div class='c1'>hello</div></div><div class='person' id='anna'><div class='name'>anna</div><div class='age'>18</div></div>",
+      "config" : {
+        "snipcache" : true
+      }
+    },
+	"for all snips":{
+      "haml" : "@hello\n@!hellocall(name=\"anna\")",
+      "html" : "<div id='head'><div class='c1'>hello</div></div><div class='person' id='anna'><div class='name'>anna</div><div class='age'>18</div></div>",
+      "config" : {
+        "snipcache" : true,
+		"snipsep" : true
+      }
+	}
+  }
+
+
+  ,"varable in placeholder content":{
+    "visit var":{
+	  "haml":"@hello1\n  #hello\n    hello\n  .hello\n    #{$var}\n#sibling #{$var}",
+      "html" : "<div id='head'><div id='hello'>hello</div><div class='hello'>31</div><div class='c1'>hello</div></div><div id='sibling'>31</div>",
+      "locals" : {
+        "var" : "31"
+      }
+    }
+    ,"change var":{
+	  "haml":"@hello1\n  #hello\n    hello\n  .hello\n    world\n    - $var++\n#sibling #{$var}",
+      "html" : "<div id='head'><div id='hello'>hello</div><div class='hello'>world</div><div class='c1'>hello</div></div><div id='sibling'>32</div>",
+      "locals" : {
+        "var" : "31"
+      }
+    }
+    ,"render seperately, visit var":{
+	  "haml":"@!hello1\n  #hello\n    hello\n  .hello\n    #{$var}\n#sibling #{$var}",
+      "html" : "<div id='head'><div id='hello'>hello</div><div class='hello'>31</div><div class='c1'>hello</div></div><div id='sibling'>31</div>",
+      "locals" : {
+        "var" : "31"
+      }
+    }
+    ,"render seperately, change var":{
+	  "haml":"@!hello1\n  #hello\n    hello\n  .hello\n    world\n    - $var++\n#sibling #{$var}",
+      "html" : "<div id='head'><div id='hello'>hello</div><div class='hello'>world</div><div class='c1'>hello</div></div><div id='sibling'>32</div>",
+      "locals" : {
+        "var" : "31"
+      }
+    }
+  }
+
+  ,"snip in placeholder":{
+    "not seperately":{
+      "haml": "@hello1\n  @hello",
+      "html" : "<div id='head'><div id='head'><div class='c1'>hello</div></div><div class='c1'>hello</div></div>" }
+    ,"seperately":{
+      "haml": "@!hello1\n  @hello",
+      "html" : "<div id='head'><div id='head'><div class='c1'>hello</div></div><div class='c1'>hello</div></div>" }
+    ,"seperately, with interpolated attr ":{
+      "haml": "@!hello1\n  @hello",
+      "html" : "<div id='head'><div id='head'><div class='c1'>hello</div></div><div class='c1'>hello</div></div>" }
+    ,"inner snip seperately":{
+      "haml": "@hello1\n  @!hello",
+      "html" : "<div id='head'><div id='head'><div class='c1'>hello</div></div><div class='c1'>hello</div></div>" }
+    ,"both snip seperately":{
+      "haml": "@!hellocall1(name=\"#{$name}\" age=\"#{$age}\")\n  - $age++;\n  @!hellocall(name=\"#{$name}\" age=\"#{$age}\")",
+      "html" : "<div class='person' id='ivy'><div class='name'>ivy</div><div class='age'>31</div></div><div class='person' id='ivy'><div class='name'>ivy</div><div class='age'>32</div></div>"	,
+      "locals" : {
+		"name": "ivy",
+        "age" : "31"}}
+  }
+
+}
