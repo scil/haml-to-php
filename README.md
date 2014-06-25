@@ -1,5 +1,7 @@
 
-# special features
+Deprecated, see [MtHamlMore](https://github.com/scil/MtHamlMore)
+
+# special features by scil
 
 - snip : like php statement 'include', details at wiki
 
